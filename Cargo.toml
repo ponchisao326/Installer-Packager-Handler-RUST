@@ -1,7 +1,9 @@
 [package]
 name = "Installer-Packager-Handler-RUST"
 version = "0.1.0"
+authors = ["Victor Gomez ponchisao326@hotmail.com"]
 edition = "2024"
+license = "MIT"
 
 [target.x86_64-pc-windows-msvc]
 linker = "x86_64-w64-mingw32-gcc"
@@ -13,4 +15,16 @@ ar = "x86_64-apple-darwin14-ar"
 [dependencies]
 rfd = "0.15.3"          # diálogos nativos multiplataforma
 zip = "3.0.0"          # creación de ZIPs
-walkdir = "2.5.0"      # iteración recursiva de carpetas
+walkdir = "2.5.0"
+libc = "0.2.172"      # iteración recursiva de carpetas
+
+# Configuración para biblioteca
+[lib]
+name = "zipper"
+crate-type = ["cdylib"]
+path = "src/lib.rs"  # Especificar ruta explícita
+
+# Configuración para binario (opcional)
+[[bin]]
+name = "zipper"
+path = "src/main.rs"

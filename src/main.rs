@@ -1,10 +1,10 @@
 use std::{
-    fs::File,
     io::{self, Read, Write},
-    path::Path,
 };
-use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 use rfd::{MessageButtons, MessageDialog, FileDialog};
+mod lib;
+use lib::crear_zip;
+
 
 fn main() -> io::Result<()> {
     // 1. Define predefined path (temporary directory + installer.zip)
@@ -53,32 +53,4 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-/// Recursively traverses `root_dir` and adds each file to the ZIP archive at `zip_path`.
-fn crear_zip(zip_path: &Path, root_dir: &Path) -> io::Result<()> {
-    let file = File::create(zip_path)?;
-    let mut zip = ZipWriter::new(file);
 
-    let options = FileOptions::<()>::default()
-        .compression_method(CompressionMethod::Deflated)
-        .unix_permissions(0o644);
-
-    for entry in walkdir::WalkDir::new(root_dir)
-        .into_iter()
-        .filter_map(Result::ok)
-        .filter(|e| e.file_type().is_file())
-    {
-        let path = entry.path();
-        let rel_path = path.strip_prefix(root_dir).unwrap();
-        let name = rel_path.to_string_lossy();
-
-        let mut f = File::open(path)?;
-        let mut buffer = Vec::new();
-        f.read_to_end(&mut buffer)?;
-
-        zip.start_file(name.as_ref(), options)?;
-        zip.write_all(&buffer)?;
-    }
-
-    zip.finish()?;
-    Ok(())
-}
